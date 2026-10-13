@@ -50,97 +50,107 @@ class _GameOverScreenState extends State<GameOverScreen>
     super.dispose();
   }
 
+  void _handleTap(VoidCallback action) {
+    HapticFeedback.mediumImpact();
+    action();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: P.black,
       body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Spacer(),
-              AnimatedBuilder(
-                animation: _flicker,
-                builder: (context, child) {
-                  return Opacity(
-                    opacity: 0.6 + (_flicker.value * 0.4),
-                    child: const Text(
-                      'GAME OVER',
-                      style: TextStyle(
-                        color: P.rare,
-                        fontSize: 60,
-                        letterSpacing: 12,
-                        fontWeight: FontWeight.w900,
-                        shadows: [
-                          Shadow(
-                            color: P.blood,
-                            blurRadius: 40,
-                          ),
-                        ],
-                      ),
+        child: Column(
+          children: [
+            const Spacer(flex: 2),
+
+            // ───── GAME OVER ─────
+            AnimatedBuilder(
+              animation: _flicker,
+              builder: (context, child) {
+                return Opacity(
+                  opacity: 0.6 + (_flicker.value * 0.4),
+                  child: const Text(
+                    'GAME OVER',
+                    style: TextStyle(
+                      color: P.rare,
+                      fontSize: 52,
+                      letterSpacing: 10,
+                      fontWeight: FontWeight.w900,
+                      shadows: [
+                        Shadow(color: P.blood, blurRadius: 40),
+                      ],
                     ),
-                  );
-                },
-              ),
-              const SizedBox(height: 20),
-              Container(
-                width: 80,
-                height: 2,
-                color: P.blood,
-              ),
-              const SizedBox(height: 30),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: Text(
-                  widget.reason,
-                  textDirection: TextDirection.rtl,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: P.white,
-                    fontSize: 15,
-                    height: 1.8,
                   ),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            Container(width: 80, height: 2, color: P.blood),
+            const SizedBox(height: 20),
+
+            // ───── السبب ─────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Text(
+                widget.reason,
+                textDirection: TextDirection.rtl,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: P.white,
+                  fontSize: 15,
+                  height: 1.8,
                 ),
               ),
-              const SizedBox(height: 40),
-              // الأزرار
-              Row(
+            ),
+
+            const Spacer(flex: 2),
+
+            // ───── الأزرار ─────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _buildButton(
                     label: 'كمّل من الغرفة',
-                    onTap: widget.onRetry,
+                    onTap: () => _handleTap(widget.onRetry),
                     color: P.rare,
+                    filled: true,
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 14),
                   _buildButton(
                     label: 'من الغرفة 1',
-                    onTap: widget.onRestart,
-                    color: P.dark,
+                    onTap: () => _handleTap(widget.onRestart),
+                    color: P.gray,
+                    filled: false,
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 14),
                   _buildButton(
                     label: 'خروج',
-                    onTap: widget.onExit,
-                    color: P.dark,
+                    onTap: () => _handleTap(widget.onExit),
+                    color: P.gray,
+                    filled: false,
                   ),
                 ],
               ),
-              const Spacer(),
-              const Padding(
-                padding: EdgeInsets.only(bottom: 16),
-                child: Text(
-                  'Nour Eldin',
-                  style: TextStyle(
-                    color: P.gray,
-                    fontSize: 11,
-                    letterSpacing: 3,
-                  ),
+            ),
+
+            const Spacer(flex: 1),
+
+            // ───── Nour Eldin ─────
+            const Padding(
+              padding: EdgeInsets.only(bottom: 12),
+              child: Text(
+                'Nour Eldin',
+                style: TextStyle(
+                  color: P.gray,
+                  fontSize: 11,
+                  letterSpacing: 3,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -150,24 +160,29 @@ class _GameOverScreenState extends State<GameOverScreen>
     required String label,
     required VoidCallback onTap,
     required Color color,
+    required bool filled,
   }) {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.mediumImpact();
-        onTap();
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        decoration: BoxDecoration(
-          border: Border.all(color: color, width: 2),
-        ),
-        child: Text(
-          label,
-          textDirection: TextDirection.rtl,
-          style: const TextStyle(
-            color: P.white,
-            fontSize: 14,
-            letterSpacing: 2,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        splashColor: color.withOpacity(0.3),
+        highlightColor: color.withOpacity(0.15),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          decoration: BoxDecoration(
+            color: filled ? color.withOpacity(0.15) : Colors.transparent,
+            border: Border.all(color: color, width: 2),
+          ),
+          child: Text(
+            label,
+            textDirection: TextDirection.rtl,
+            style: const TextStyle(
+              color: P.white,
+              fontSize: 14,
+              letterSpacing: 2,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ),
